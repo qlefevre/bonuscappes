@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+functions/export.xlsx
+functions/resultat.xlsx
+resultat.xlsx
