@@ -14,17 +14,26 @@ def load_workbook_from_url(url):
 # Charge le dernier jeu de données et l'importe dans le modèle
 
 
-# Fichiers Excel
-srcWb = load_workbook_from_url(
-    'https://bourse.societegenerale.fr/EmcWebApi/api/ProductSearch/Export?PageNum=1&ProductClassificationId=19&AssetTypeId=2&AssetTypeMenuId=35')
-# srcWb = load_workbook(path.join(sys.path[0], 'export.xlsx'))
-modWb = load_workbook(path.join(sys.path[0], 'modele.xlsx'))
-# Onglets Export
-srcWs = srcWb['EXPORT']
-modWs = modWb['EXPORT']
-# Copie les données de l'onglet Export du fichier source vers le modèle
-for row in srcWs:
-    for cell in row:
-        modWs[cell.coordinate].value = cell.value
+def handle(event, context):
 
-modWb.save(path.join(sys.path[0], 'resultat.xlsx'))
+    # Fichiers Excel
+    srcWb = load_workbook_from_url(
+        'https://bourse.societegenerale.fr/EmcWebApi/api/ProductSearch/Export?PageNum=1&ProductClassificationId=19&AssetTypeId=2&AssetTypeMenuId=35')
+    # srcWb = load_workbook(path.join(sys.path[0], 'export.xlsx'))
+    modWb = load_workbook(path.join(sys.path[0], 'modele.xlsx'))
+    # Onglets Export
+    srcWs = srcWb['EXPORT']
+    modWs = modWb['EXPORT']
+    # Copie les données de l'onglet Export du fichier source vers le modèle
+    for row in srcWs:
+        for cell in row:
+            modWs[cell.coordinate].value = cell.value
+
+    modWb.save(path.join(sys.path[0], 'resultat.xlsx'))
+
+    return 'dsd'
+
+
+# main
+if __name__ == '__main__':
+    handle(None, None)

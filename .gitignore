@@ -131,3 +131,4 @@ dmypy.json
 functions/export.xlsx
 functions/resultat.xlsx
 resultat.xlsx
+.serverless

@@ -1,0 +1,43 @@
+service: bonuscappes
+configValidationMode: off
+frameworkVersion: "2 || 3"
+
+provider:
+  name: scaleway
+  runtime: python3
+  scwToken: ${env:AWS_SECRET_ACCESS_KEY}
+  scwProject: ${env:AWS_PROJECT_ID}
+
+functions:
+  bc-extract-sg:
+    handler: functions/extract_sg.handle
+    minScale: 0
+    maxScale: 1
+    memorySize: 128
+    description: Télécharge les stability warrants de la Société Générale
+    events:
+      # 00h10
+      - schedule:
+          rate: "10 2 * * *"
+
+plugins:
+  - serverless-scaleway-functions
+  - serverless-python-requirements
+  - serverless-offline-scaleway
+custom:
+  pythonRequirements:
+    noDeploy:
+      - urllib
+
+package:
+  patterns:
+    - "!node_modules/**"
+    - "!.gitignore"
+    - "!.git/**"
+    - "!.idea/**"
+    - "!*.html"
+    - "!*.md"
+    - "!*.txt"
+    - "!functions/resultat.xlsx"
+    - "!functions/export.xlsx"
+    - "!docs/**"
