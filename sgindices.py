@@ -7,22 +7,7 @@ import base64
 from datetime import date
 
 
-def load_workbook_from_url(url):
-    # Charge un fichier Excel depuis url
-    file = urllib.request.urlopen(url).read()
-    return load_workbook(filename=BytesIO(file))
-
-
-def save_virtual_workbook(workbook):
-    # Charge le dernier jeu de données et l'importe dans le modèle
-    with NamedTemporaryFile(delete=False) as tf:
-        workbook.save(tf.name)
-        in_memory = BytesIO(tf.read())
-        return in_memory.getvalue()
-
-
 def handle(event, context):
-
     # Fichiers Excel
     srcWb = load_workbook_from_url(
         'https://bourse.societegenerale.fr/EmcWebApi/api/ProductSearch/Export?PageNum=1&ProductClassificationId=19&AssetTypeId=2&AssetTypeMenuId=35')
@@ -39,7 +24,6 @@ def handle(event, context):
             modWs[cell.coordinate].value = cell.value
 
     output = save_virtual_workbook(modWb)
-
     return {
         "body":  base64.b64encode(output).decode('UTF-8'),
         "statusCode": 200,
@@ -51,6 +35,15 @@ def handle(event, context):
     }
 
 
-# main
-if __name__ == '__main__':
-    handle(None, None)
+def load_workbook_from_url(url):
+    # Charge un fichier Excel depuis url
+    file = urllib.request.urlopen(url).read()
+    return load_workbook(filename=BytesIO(file))
+
+
+def save_virtual_workbook(workbook):
+    # Charge le dernier jeu de données et l'importe dans le modèle
+    with NamedTemporaryFile(delete=False) as tf:
+        workbook.save(tf.name)
+        in_memory = BytesIO(tf.read())
+        return in_memory.getvalue()
