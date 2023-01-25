@@ -1,22 +1,20 @@
 service: bonuscappes
 configValidationMode: off
-frameworkVersion: "2 || 3"
-
 provider:
   name: scaleway
-  runtime: python3
-  scwToken: rr
-  scwProject: rr
-  #scwToken: ${env:AWS_SECRET_ACCESS_KEY}
-  #scwProject: ${env:AWS_PROJECT_ID}
+  runtime: python310
+  # ID secret key
+  # scwToken:
+  # ID de l'organisation
+  # scwProject:
 
 functions:
-  bc-extract-sg:
+  indices-sg:
     handler: extract_sg.handle
     minScale: 0
     maxScale: 1
     memorySize: 128
-    description: Télécharge les stability warrants de la Société Générale
+    description: Télécharge les bonus cappés de la Société Générale
     events:
       # 00h10
       - schedule:
