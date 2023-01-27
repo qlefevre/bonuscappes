@@ -3,6 +3,7 @@ from io import BytesIO
 import urllib.request
 import base64
 from datetime import date
+from tempfile import NamedTemporaryFile
 
 
 def handle(event, context):
@@ -22,15 +23,19 @@ def handle(event, context):
             modWs[cell.coordinate].value = cell.value
 
     output = save_virtual_workbook(modWb)
-    return {
-        "body":  base64.b64encode(output).decode('UTF-8'),
-        "statusCode": 200,
-        "isBase64Encoded": True,
-        "headers": {
-            "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-            "Content-Disposition": "attachment;filename=Bonus_Cappes_SG_Indices_"+date.today().strftime("%Y%m%d")+".xlsx"
-        }
-    }
+    with open("Bonus_Cappes_SG_Indices_"+date.today().strftime("%Y%m%d")+".xlsx", "wb") as binary_file:
+        # Write bytes to file
+        binary_file.write(output)
+
+    # return {
+    #     "body":  base64.b64encode(output).decode('UTF-8'),
+    #     "statusCode": 200,
+    #     "isBase64Encoded": True,
+    #     "headers": {
+    #         "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    #         "Content-Disposition": "attachment;filename=Bonus_Cappes_SG_Indices_"+date.today().strftime("%Y%m%d")+".xlsx"
+    #     }
+    # }
 
 
 def load_workbook_from_url(url):
@@ -45,7 +50,7 @@ def save_virtual_workbook(workbook):
         workbook.save(tf.name)
         in_memory = BytesIO(tf.read())
         return in_memory.getvalue()
-		
-		
+
+
 if __name__ == '__main__':
     handle(None, None)
