@@ -1,7 +1,5 @@
 from openpyxl import load_workbook
 from io import BytesIO
-from io import BytesIO
-from tempfile import NamedTemporaryFile
 import urllib.request
 import base64
 from datetime import date
@@ -47,3 +45,7 @@ def save_virtual_workbook(workbook):
         workbook.save(tf.name)
         in_memory = BytesIO(tf.read())
         return in_memory.getvalue()
+		
+		
+if __name__ == '__main__':
+    handle(None, None)

@@ -40,8 +40,3 @@ functions:
       # 00h10
       - schedule:
           rate: "10 2 * * *"
-  bam:
-    handler: handler.handle
-    minScale: 0
-    maxScale: 1
-    description: Bam
