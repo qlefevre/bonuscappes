@@ -9,10 +9,10 @@ from tempfile import NamedTemporaryFile
 def handle(event, context):
     # Fichiers Excel
     srcWb = load_workbook_from_url(
-        'https://bourse.societegenerale.fr/EmcWebApi/api/ProductSearch/Export?PageNum=1&ProductClassificationId=19&AssetTypeId=2&AssetTypeMenuId=35')
+        'https://bourse.societegenerale.fr/EmcWebApi/api/ProductSearch/Export?PageNum=1&ProductClassificationId=19&AssetTypeId=1&AssetTypeMenuId=32')
     # srcWb = load_workbook(path.join(sys.path[0], 'export.xlsx'))
     modWb = load_workbook_from_url(
-        'https://raw.githubusercontent.com/qlefevre/bonuscappes/main/xlsx/modele_indices.xlsx')
+        'https://raw.githubusercontent.com/qlefevre/bonuscappes/main/xlsx/modele_actions.xlsx')
     # modWb = load_workbook(path.join(sys.path[0], 'modele.xlsx'))
     # Onglets Export
     srcWs = srcWb['EXPORT']
@@ -23,7 +23,7 @@ def handle(event, context):
             modWs[cell.coordinate].value = cell.value
 
     output = save_virtual_workbook(modWb)
-    with open("Bonus_Cappes_SG_Indices_"+date.today().strftime("%Y%m%d")+".xlsx", "wb") as binary_file:
+    with open("Bonus_Cappes_SG_Actions_FR_"+date.today().strftime("%Y%m%d")+".xlsx", "wb") as binary_file:
         # Write bytes to file
         binary_file.write(output)
 
