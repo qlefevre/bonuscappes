@@ -14,8 +14,7 @@ plugins:
   - serverless-offline-scaleway
 custom:
   pythonRequirements:
-    noDeploy:
-      - urllib
+    dockerizePip: true
 
 package:
   patterns:
