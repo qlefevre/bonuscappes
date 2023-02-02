@@ -2,40 +2,23 @@ service: bonuscappes
 configValidationMode: off
 provider:
   name: scaleway
-  runtime: python310
-  # ID secret key
-  # scwToken:
-  # ID de l'organisation
-  # scwProject:
 
 plugins:
   - serverless-scaleway-functions
-  - serverless-python-requirements
-  - serverless-offline-scaleway
-custom:
-  pythonRequirements:
-    dockerizePip: true
 
 package:
   patterns:
-    - "!node_modules/**"
-    - "!.gitignore"
-    - "!.git/**"
-    - "!.idea/**"
-    - "!*.html"
-    - "!*.md"
-    - "!*.txt"
-    - "!functions/resultat.xlsx"
-    - "!functions/export.xlsx"
-    - "!docs/**"
+    - '!node_modules/**'
+    - '!.gitignore'
+    - '!.git/**'
 
-functions:
-  indices-sg:
-    handler: sgindices.handle
-    minScale: 0
-    maxScale: 1
-    description: Télécharge les bonus cappés de la Société Générale
-    events:
-      # 00h10
-      - schedule:
-          rate: "10 2 * * *"
+custom:
+  containers:
+    first:
+      directory: java-container
+      description: Télécharge les bonus cappés de la Société Générale
+      minScale: 1
+      maxScale: 2
+      memoryLimit: 128
+      env:
+        MODELE_INDICES: https://raw.githubusercontent.com/qlefevre/bonuscappes/main/xlsx/modele_indices.xlsx
