@@ -3,10 +3,7 @@ import io.undertow.Undertow;
 import io.undertow.util.Headers;
 import io.undertow.util.PathTemplateMatch;
 import org.apache.commons.lang3.SystemUtils;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
 import org.jboss.logging.Logger;
 
 import java.io.ByteArrayInputStream;
@@ -14,11 +11,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
 
 import static io.undertow.util.PathTemplateMatch.ATTACHMENT_KEY;
+import static java.lang.Boolean.parseBoolean;
 
 public class Handler {
 
@@ -56,7 +55,7 @@ public class Handler {
 
                     // Copie l'onglet modèle
                     copySheet(exportBcSgWs,exportModelWs);
-                    modelWb.setForceFormulaRecalculation(true); // a verifier
+                    XSSFFormulaEvaluator.evaluateAllFormulaCells(modelWb);
 
                     // Sauvegarde
                     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
@@ -68,17 +67,24 @@ public class Handler {
                     String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
                     String filename = "Bonus_Cappes_SG_Indices_%s.xlsx".formatted(date);
 
-                    exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                    exchange.getResponseSender().send("""
-                            {
-                                "body": "%s",
-                                "statusCode": 200,
-                                "isBase64Encoded": true,
-                                "headers": {
-                                    "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                    "Content-Disposition": "attachment;filename=%s"
-                                }
-                            }""".formatted(body, filename));
+                    boolean devMode = !exchange.getQueryParameters().get("dev").isEmpty();
+                    if(devMode){
+                        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                        exchange.getResponseHeaders().put(Headers.CONTENT_DISPOSITION,"attachment;filename=%s".formatted(filename));
+                        exchange.getResponseSender().send(ByteBuffer.wrap(excelOutput.toByteArray()));
+                    }else {
+                        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
+                        exchange.getResponseSender().send("""
+                                {
+                                    "body": "%s",
+                                    "statusCode": 200,
+                                    "isBase64Encoded": true,
+                                    "headers": {
+                                        "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                        "Content-Disposition": "attachment;filename=%s"
+                                    }
+                                }""".formatted(body, filename));
+                    }
                 })).build();
         server.start();
     }
