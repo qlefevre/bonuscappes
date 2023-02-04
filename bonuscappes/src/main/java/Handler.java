@@ -32,11 +32,10 @@ public class Handler {
     public static void main(String[] args) {
         String port = SystemUtils.getEnvironmentVariable("PORT", DEFAULT_PORT);
         LOGGER.infof("HTTP server listening on 0.0.0.0:%s", port);
+        LOGGER.infof("Try http://localhost:%s/sg/indices?dev=true", port);
         Undertow server = Undertow.builder()
                 .addHttpListener(Integer.parseInt(port), "0.0.0.0")
                 .setHandler(Handlers.pathTemplate().add("/sg/{assetType}", exchange -> {
-
-                    // https://howtodoinjava.com/java/library/readingwriting-excel-files-in-java-poi-tutorial/
 
                     // Type
                     PathTemplateMatch pathMatch = exchange.getAttachment(ATTACHMENT_KEY);
