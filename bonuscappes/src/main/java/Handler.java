@@ -55,6 +55,8 @@ public class Handler {
 
                     // Copie l'onglet modèle
                     copySheet(exportBcSgWs,exportModelWs);
+                    XSSFSheet calculModelWs = modelWb.getSheet("calcul");
+                    removeRows(calculModelWs,exportModelWs.getLastRowNum());
                     XSSFFormulaEvaluator.evaluateAllFormulaCells(modelWb);
 
                     // Sauvegarde
@@ -87,6 +89,15 @@ public class Handler {
                     }
                 })).build();
         server.start();
+    }
+
+    private static void removeRows(XSSFSheet calculModelWs, int lastRowNum) {
+        int fRow = lastRowNum+1;
+        int lRow = calculModelWs.getLastRowNum();
+        for (int iRow = fRow; iRow <= lRow; iRow++) {
+            XSSFRow row = calculModelWs.getRow(iRow);
+            calculModelWs.removeRow(row);
+        }
     }
 
     private static void copySheet(XSSFSheet sheet, XSSFSheet mySheet) {
