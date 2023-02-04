@@ -14,7 +14,7 @@ package:
 
 custom:
   containers:
-    first:
+    bonuscappes:
       directory: bonuscappes
       description: Télécharge les bonus cappés de la Société Générale
       minScale: 0
