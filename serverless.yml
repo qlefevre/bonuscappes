@@ -17,8 +17,11 @@ custom:
     first:
       directory: bonuscappes
       description: Télécharge les bonus cappés de la Société Générale
-      minScale: 1
-      maxScale: 2
+      minScale: 0
+      maxScale: 1
       memoryLimit: 128
       env:
         MODELE_INDICES: https://raw.githubusercontent.com/qlefevre/bonuscappes/main/xlsx/modele_indices.xlsx
+        MODELE_ACTIONS: https://raw.githubusercontent.com/qlefevre/bonuscappes/main/xlsx/modele_actions.xlsx
+        BC_SG_INDICES: https://bourse.societegenerale.fr/EmcWebApi/api/ProductSearch/Export?PageNum=1&ProductClassificationId=19&AssetTypeId=2&AssetTypeMenuId=35&BarrierHit=1
+        BC_SG_ACTIONS: https://bourse.societegenerale.fr/EmcWebApi/api/ProductSearch/Export?PageNum=1&ProductClassificationId=19&AssetTypeId=1&AssetTypeMenuId=32&BarrierHit=1 
