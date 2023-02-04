@@ -32,7 +32,7 @@ public class Handler {
     public static void main(String[] args) {
         String port = SystemUtils.getEnvironmentVariable("PORT", DEFAULT_PORT);
         LOGGER.infof("HTTP server listening on 0.0.0.0:%s", port);
-        LOGGER.infof("Try http://localhost:%s/sg/indices?dev=true", port);
+        LOGGER.infof("Try http://localhost:%s/sg/indices", port);
         Undertow server = Undertow.builder()
                 .addHttpListener(Integer.parseInt(port), "0.0.0.0")
                 .setHandler(Handlers.pathTemplate().add("/sg/{assetType}", exchange -> {
@@ -70,25 +70,10 @@ public class Handler {
                     String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
                     String filename = "Bonus_Cappes_SG_Indices_%s.xlsx".formatted(date);
 
-                    Map<String, Deque<String>> queryParam = exchange.getQueryParameters();
-                    boolean devMode = !(queryParam.get("dev") == null || queryParam.get("dev").isEmpty());
-                    if(devMode){
-                        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-                        exchange.getResponseHeaders().put(Headers.CONTENT_DISPOSITION,"attachment;filename=%s".formatted(filename));
-                        exchange.getResponseSender().send(ByteBuffer.wrap(excelOutput.toByteArray()));
-                    }else {
-                        exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/json");
-                        exchange.getResponseSender().send("""
-                                {
-                                    "body": "%s",
-                                    "statusCode": 200,
-                                    "isBase64Encoded": true,
-                                    "headers": {
-                                        "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                        "Content-Disposition": "attachment;filename=%s"
-                                    }
-                                }""".formatted(body, filename));
-                    }
+                    exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+                    exchange.getResponseHeaders().put(Headers.CONTENT_DISPOSITION,"attachment;filename=%s".formatted(filename));
+                    exchange.getResponseSender().send(ByteBuffer.wrap(excelOutput.toByteArray()));
+
                 })).build();
         server.start();
     }
