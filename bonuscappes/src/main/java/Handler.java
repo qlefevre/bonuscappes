@@ -15,6 +15,8 @@ import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Base64;
 import java.util.Date;
+import java.util.Deque;
+import java.util.Map;
 
 import static io.undertow.util.PathTemplateMatch.ATTACHMENT_KEY;
 import static java.lang.Boolean.parseBoolean;
@@ -69,7 +71,8 @@ public class Handler {
                     String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
                     String filename = "Bonus_Cappes_SG_Indices_%s.xlsx".formatted(date);
 
-                    boolean devMode = !exchange.getQueryParameters().get("dev").isEmpty();
+                    Map<String, Deque<String>> queryParam = exchange.getQueryParameters();
+                    boolean devMode = !(queryParam.get("dev") == null || queryParam.get("dev").isEmpty());
                     if(devMode){
                         exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                         exchange.getResponseHeaders().put(Headers.CONTENT_DISPOSITION,"attachment;filename=%s".formatted(filename));
