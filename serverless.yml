@@ -15,7 +15,7 @@ package:
 custom:
   containers:
     first:
-      directory: java-container
+      directory: bonuscappes
       description: Télécharge les bonus cappés de la Société Générale
       minScale: 1
       maxScale: 2
