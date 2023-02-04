@@ -56,6 +56,7 @@ public class Handler {
 
                     // Copie l'onglet modèle
                     copySheet(exportBcSgWs,exportModelWs);
+                    modelWb.setForceFormulaRecalculation(true); // a verifier
 
                     // Sauvegarde
                     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
