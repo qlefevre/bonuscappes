@@ -58,7 +58,8 @@ public class Handler {
                     copySheet(exportBcSgWs,exportModelWs);
                     XSSFSheet calculModelWs = modelWb.getSheet("calcul");
                     removeRows(calculModelWs,exportModelWs.getLastRowNum());
-                    XSSFFormulaEvaluator.evaluateAllFormulaCells(modelWb);
+                    modelWb.setForceFormulaRecalculation(true);
+                    //XSSFFormulaEvaluator.evaluateAllFormulaCells(modelWb);
 
                     // Sauvegarde
                     ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
