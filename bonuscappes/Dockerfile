@@ -11,5 +11,5 @@ RUN mvn -f /home/app/pom.xml clean package
 #
 FROM eclipse-temurin:17-jre-alpine
 COPY --from=build /home/app/target/bonuscappes-1.0-jar-with-dependencies.jar /usr/local/lib/bonuscappes.jar
-# limit jvm to 32mb
-ENTRYPOINT ["java","-Xmx128m","-jar","/usr/local/lib/bonuscappes.jar"]
+# limit jvm to 48mb
+ENTRYPOINT ["java","-Xmx48m","-jar","/usr/local/lib/bonuscappes.jar"]

@@ -6,24 +6,18 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.poi.xssf.usermodel.*;
 import org.jboss.logging.Logger;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
-import java.util.Base64;
 import java.util.Date;
-import java.util.Deque;
-import java.util.Map;
 
 import static io.undertow.util.PathTemplateMatch.ATTACHMENT_KEY;
-import static java.lang.Boolean.parseBoolean;
+import static org.apache.commons.lang3.StringUtils.capitalize;
 
 public class Handler {
 
-    private static Logger LOGGER = Logger.getLogger(Handler.class);
+    private static final Logger LOGGER = Logger.getLogger(Handler.class);
 
     private static final String DEFAULT_BC_SG_URL = "https://bourse.societegenerale.fr/EmcWebApi/api/ProductSearch/Export?PageNum=1&ProductClassificationId=19&AssetTypeId=2&AssetTypeMenuId=35&BarrierHit=1";
     private static final String DEFAULT_MODEL_URL = "https://raw.githubusercontent.com/qlefevre/bonuscappes/main/xlsx/modele_indices.xlsx";
@@ -46,30 +40,11 @@ public class Handler {
                     ByteArrayInputStream excelSG = downloadSG(assetType);
                     ByteArrayInputStream excelModel = downloadModel(assetType);
 
-                    // Bonus Cappes SG Excel
-                    XSSFWorkbook bcSgWb = new XSSFWorkbook(excelSG);
-                    XSSFSheet exportBcSgWs = bcSgWb.getSheet("EXPORT");
+                    // Fusionne les fichiers Excel
+                    ByteArrayOutputStream excelOutput = mergeExcels(excelSG, excelModel);
 
-                    // Modèle
-                    XSSFWorkbook modelWb = new XSSFWorkbook(excelModel);
-                    XSSFSheet exportModelWs = modelWb.getSheet("EXPORT");
-
-                    // Copie l'onglet modèle
-                    copySheet(exportBcSgWs,exportModelWs);
-                    XSSFSheet calculModelWs = modelWb.getSheet("calcul");
-                    removeRows(calculModelWs,exportModelWs.getLastRowNum());
-                    modelWb.setForceFormulaRecalculation(true);
-                    //XSSFFormulaEvaluator.evaluateAllFormulaCells(modelWb);
-
-                    // Sauvegarde
-                    ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
-                    try (OutputStream os = excelOutput) {
-                        modelWb.write(os);
-                    }
-
-                    String body = Base64.getEncoder().encodeToString(excelOutput.toByteArray());
                     String date = new SimpleDateFormat("yyyyMMdd").format(new Date());
-                    String filename = "Bonus_Cappes_SG_Indices_%s.xlsx".formatted(date);
+                    String filename = "Bonus_Cappes_SG_%s_%s.xlsx".formatted(capitalize(assetType),date);
 
                     exchange.getResponseHeaders().put(Headers.CONTENT_TYPE, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
                     exchange.getResponseHeaders().put(Headers.CONTENT_DISPOSITION,"attachment;filename=%s".formatted(filename));
@@ -77,6 +52,36 @@ public class Handler {
 
                 })).build();
         server.start();
+    }
+
+    private static ByteArrayOutputStream mergeExcels(ByteArrayInputStream excelSG, ByteArrayInputStream excelModel) throws IOException {
+
+        LOGGER.infof("Excel file generation in progress.");
+
+        // Bonus Cappes SG Excel
+        XSSFWorkbook bcSgWb = new XSSFWorkbook(excelSG);
+        XSSFSheet exportBcSgWs = bcSgWb.getSheet("EXPORT");
+
+        // Modèle
+        XSSFWorkbook modelWb = new XSSFWorkbook(excelModel);
+        XSSFSheet exportModelWs = modelWb.getSheet("EXPORT");
+
+        // Copie l'onglet modèle
+        copySheet(exportBcSgWs,exportModelWs);
+        XSSFSheet calculModelWs = modelWb.getSheet("calcul");
+        removeRows(calculModelWs,exportModelWs.getLastRowNum());
+        modelWb.setForceFormulaRecalculation(true);
+        //XSSFFormulaEvaluator.evaluateAllFormulaCells(modelWb);
+
+        // Sauvegarde
+        ByteArrayOutputStream excelOutput = new ByteArrayOutputStream();
+        try (OutputStream os = excelOutput) {
+            modelWb.write(os);
+        }
+
+        LOGGER.infof("Excel file generation completed.");
+
+        return excelOutput;
     }
 
     private static void removeRows(XSSFSheet calculModelWs, int lastRowNum) {
